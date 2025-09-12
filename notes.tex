@@ -1,0 +1,318 @@
+\documentclass[11pt]{article}
+
+% Increase main memory size
+\usepackage{etex}
+\usepackage{morewrites}
+\usepackage{multicol}
+\usepackage{pgfplots}
+\usepackage{tikz}
+\usetikzlibrary{external}
+\tikzexternalize[prefix=cached_models/]
+
+\usepackage{etex}
+\usepackage{morewrites}
+\usepackage{enumitem}
+\usepackage{float}
+
+\listfiles
+
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{verbatim}
+\usetikzlibrary{3d}
+
+% Page Layout
+\geometry{a4paper, margin=1in}
+\setlength\parindent{0pt}
+\pgfplotsset{compat=1.18}
+
+% Custom commands
+\newcommand{\card}[1]{\lvert #1 \rvert}
+\newcommand{\inner}[2]{\left\langle #1, #2 \right\rangle}
+
+\title{\textbf{Numerical Linear Algebra}}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section{Matrices, Vectors, and Norms}
+\subsection{Matrix-Vector Multiplication}
+Given a matrix \( A \in \mathbb{C}^{m \times n} \) and a vector \( x \in \mathbb{C}^n \), the matrix-vector product \( Ax = b \in \mathbb{C}^m \) is defined as:
+
+\[
+b_i = \sum_{j=1}^{n} a_{ij} x_j, \quad \text{for } i = 1, \ldots, m
+\]
+
+where \( a_{ij} \) are the entries of the matrix \( A \).
+
+\subsubsection*{Observation}
+The transformation \( x \mapsto Ax \) is a linear transformation from \( \mathbb{C}^n \) to \( \mathbb{C}^m \), i.e., it satisfies:
+\[
+A(x + y) = Ax + Ay, \quad A(\alpha x) = \alpha Ax, \quad \text{for all } x, y \in \mathbb{C}^n, \alpha \in \mathbb{C}
+\]
+
+\subsubsection{A Matrix times a Vector}
+\[b = Ax = \sum_{j=1}^{n} x_j a_j\]
+where \( a_j \) is the \( j \)-th column of \( A \).
+
+\[\begin{bmatrix}
+b_1 \\
+b_2 \\
+\vdots \\
+b_m
+\end{bmatrix} =
+\begin{bmatrix}
+a_{11} & a_{12} & \cdots & a_{1n} \\
+a_{21} & a_{22} & \cdots & a_{2n} \\
+\vdots & \vdots & \ddots & \vdots \\
+a_{m1} & a_{m2} & \cdots & a_{mn}
+\end{bmatrix}
+\begin{bmatrix}
+x_1 \\
+x_2 \\
+\vdots \\
+x_n
+\end{bmatrix} =
+x_1
+\begin{bmatrix}
+a_{11} \\
+a_{21} \\
+\vdots \\
+a_{m1}
+\end{bmatrix} +
+x_2
+\begin{bmatrix}
+a_{12} \\
+a_{22} \\
+\vdots \\
+a_{m2}
+\end{bmatrix} + \cdots +
+x_n
+\begin{bmatrix}
+a_{1n} \\
+a_{2n} \\
+\vdots \\
+a_{mn}
+\end{bmatrix}\]
+
+\subsubsection*{Example: Vandermonde Matrix}
+A Vandermonde matrix is defined as:
+\[
+A = \begin{bmatrix}
+1 & x_1 & x_1^2 & \cdots & x_1^{n-1} \\
+1 & x_2 & x_2^2 & \cdots & x_2^{n-1} \\
+\vdots & \vdots & \vdots & \ddots & \vdots \\
+1 & x_m & x_m^2 & \cdots & x_m^{n-1}
+\end{bmatrix} \in \mathbb{C}^{m \times n}
+\]
+
+\subsubsection*{Observation}
+Let fix the sequence \( \{x_1, x_2, \ldots, x_m \} \). If $p$ and $q$ are polynomials of degree at most $n-1$ and $\alpha$ is a scalar, then:
+\begin{enumerate}
+    \item $(p + q)$ is a polynomial of degree at most $n-1$, and so are $\alpha p, \alpha q$.
+    \item $(p + q)(x_i) = p(x_i) + q(x_i)$ for $i = 1, \ldots, m$.
+    \item $(\alpha p)(x_i) = \alpha p(x_i)$ for $i = 1, \ldots, m$.
+\end{enumerate}
+
+\subsubsection*{Observation}
+Suppose we have a vector \( c \in \mathbb{C}^n \) representing the coefficients of a polynomial \( p(x) = c_0 + c_1 x + c_2 x^2 + \cdots + c_{n-1} x^{n-1} \). Then 
+\[p(x_i) = (Ac)_i = c_0 + c_1 x_i + c_2 x_i^2 + \cdots + c_{n-1} x_i^{n-1}\]
+
+Any polynomial of degree at most \( n-1 \) can be represented as
+\[p(x) = \begin{bmatrix}
+1 & x & x^2 & \cdots & x^{n-1}
+\end{bmatrix}
+\begin{bmatrix}
+c_0 \\
+c_1 \\
+c_2 \\
+\vdots \\
+c_{n-1}
+\end{bmatrix}
+\]
+
+\subsection{Matrix-Matrix Multiplication}
+Given matrices \( A \in \mathbb{C}^{l \times m} \) and \( C \in \mathbb{C}^{m \times n} \), the matrix-matrix product \( B = AC \in \mathbb{C}^{l \times n} \) is defined as:
+
+\[
+b_{ij} = \sum_{k=1}^{m} a_{ik} c_{kj}, \quad \text{for } i = 1, \ldots, l, j = 1, \ldots, n
+\]
+
+So,
+\[B = \begin{bmatrix}
+b_1 & b_2 & \cdots & b_n
+\end{bmatrix} = \begin{bmatrix}
+a_1 & a_2 & \cdots & a_m
+\end{bmatrix} \begin{bmatrix}
+c_1 & c_2 & \cdots & c_n
+\end{bmatrix}\]
+\[b_j = Ac_j = \sum_{k=1}^{m} c_{kj} a_k, \quad j = 1, \ldots, n\]
+
+\subsubsection*{Example: Outer Product}
+Given two vectors \( u \in \mathbb{C}^{m\times 1} \) and \( v \in \mathbb{C}^{1\times n} \), the outer product \( uv^T \in \mathbb{C}^{m \times n} \) is defined as:
+\[\begin{bmatrix}
+    u_1 \\
+    u_2 \\
+    \vdots \\
+    u_m
+\end{bmatrix}
+\begin{bmatrix}
+    v_1 & v_2 & \cdots & v_n
+\end{bmatrix} = \begin{bmatrix}
+    u_1 v_1 & u_1 v_2 & \cdots & u_1 v_n \\
+    u_2 v_1 & u_2 v_2 & \cdots & u_2 v_n \\
+    \vdots & \vdots & \ddots & \vdots \\
+    u_m v_1 & u_m v_2 & \cdots & u_m v_n
+\end{bmatrix}
+\]
+
+\subsubsection*{Example}
+Let \( B \in \mathbb{C}^{m \times n} \), let \( a_1, a_2, \ldots, a_n \) be the columns of \( A \in \mathbb{C}^{m \times n} \) and let \( R \in \mathbb{C}^{n \times n} \) be an upper triangular matrix with all its superdiagonal entries equal to 1 such that
+\[B = \begin{bmatrix}
+    b_1 & b_2 & \dots & b_n
+\end{bmatrix} = \begin{bmatrix}
+    a_1 & a_2 & \dots & a_n
+\end{bmatrix} \begin{bmatrix}
+    1 & 1 & \dots & 1 \\
+    0 & 1 & \dots & 1 \\
+    \vdots & \vdots & \ddots & \vdots \\
+    0 & 0 & \dots & 1
+\end{bmatrix}\]
+Then,
+\[b_j = A r_j = \sum_{k=1}^{j} a_k, \quad j = 1, \ldots, n\] 
+which is known as the indefinite integral operation.
+
+\subsection{Range and Null Space}
+\subsubsection*{Theorem}
+The range of a matrix \( A \in \mathbb{C}^{m \times n} \) is the space spanned by its columns, i.e. it's column space.
+\begin{quotation}
+    \textit{"The set of vectors that can be written as \( Ax \) for some \( x \in \mathbb{C}^n \)."}
+\end{quotation}
+
+\subsubsection{Null Space and Rank}
+The null space of a matrix \( A \in \mathbb{C}^{m \times n} \) is defined as:
+\[\text{span} \{x \in \mathbb{C}^n : Ax = 0\}\]
+
+The rank of a matrix \( A \in \mathbb{C}^{m \times n} \) is defined as the dimension of its range:
+\[\text{rank}(A) = \dim(\text{range}(A))\]
+
+\subsubsection*{Theorem}
+For any matrix \( A \in \mathbb{C}^{m \times n}, m \geq n \), \( A \) has full rank if and only if it maps no two distinct vectors to the same vector:
+\[Ax = Ay \implies x = y, \forall x, y \in \mathbb{C}^n \quad \text{and} \quad Ax \neq Ay \implies x \neq y, \forall x, y \in \mathbb{C}^n\]
+
+\subsubsection{Non-singular Matrices}
+A non-singular matrix, or invertible matrix is a square matrix \( A \in \mathbb{C}^{n \times n} \) that has full rank.
+
+\subsubsection{Inverse of a Matrix}
+The matrix \( A \in \mathbb{C}^{n \times n} \) is the inverse of \( Z \) if and only if:
+\[AZ = ZA = I = \begin{bmatrix}
+    e_1 & e_2 & \cdots & e_n
+\end{bmatrix}\]
+where \( e_i \) is the \( i \)-th standard basis vector. Furthermore, the inverse of a matrix is unique and
+\[\text{rank}(A) = n = \text{rank}(Z)\]
+
+\subsubsection*{Theorem}
+For $A \in \mathbb{C}^{n \times n}$, the following statements are equivalent:
+\begin{enumerate}
+    \item $A$ has an inverse $A^{-1}$.
+    \item $A$ has full rank, i.e. $\text{rank}(A) = n$.
+    \item The columns of $A$ span $\mathbb{C}^n$, i.e. $\text{range}(A) = \mathbb{C}^n$.
+    \item The columns of $A$ are linearly independent, i.e. $\text{null}(A) = \{0\}$.
+    \item $0$ is not an eigenvalue of $A$.
+    \item $0$ is not a singular value of $A$.
+    \item $\card{A} \neq 0$.
+\end{enumerate}
+
+\subsection{Orthogonal Vectors and Matrices}
+\subsubsection{Complex Conjugate and Conjugate Transpose}
+Given $z \in \mathbb{C}$, the complex conjugate of $z$ is denoted by $\bar{z}$ or $z^*$, where if $z = x + iy$, then $\bar{z} = x - iy$.
+
+The conjugate transpose of a matrix $A \in \mathbb{C}^{m \times n}$ is denoted by $A^*$, where $A^* = \bar{A}^T$.
+\[A = \begin{bmatrix}
+    a_{11} & a_{12} \\
+    a_{21} & a_{22} \\
+    a_{31} & a_{32} \\
+\end{bmatrix} \implies A^* = \begin{bmatrix}
+    \bar{a}_{11} & \bar{a}_{21} & \bar{a}_{31} \\
+    \bar{a}_{12} & \bar{a}_{22} & \bar{a}_{32} \\
+\end{bmatrix}\]
+
+\subsubsection{Hermitian Matrices and Skew-Hermitian Matrices}
+A matrix $A \in \mathbb{C}^{n \times n}$ is called Hermitian if $A^* = A$. (Or $A = A^T$ if $A \in \mathbb{R}^{n \times n}$.)
+
+A matrix $A \in \mathbb{C}^{n \times n}$ is called Skew-Hermitian if $A^* = -A$. (Or $A = -A^T$ if $A \in \mathbb{R}^{n \times n}$.)
+
+\subsubsection{Inner Product and Norm}
+Given two vectors $x, y \in \mathbb{C}^n$, the inner product is defined as:
+\[\inner{x}{y} = y^* x = \sum_{i=1}^{n} \bar{y}_i x_i\]
+
+The norm of a vector $x \in \mathbb{C}^n$ is defined as:
+\[\|x\| = \sqrt{\inner{x}{x}} = \sqrt{\sum_{i=1}^{n} |x_i|^2}\]
+
+The modulus of a complex number $z \in \mathbb{C}$ is defined as:
+\[|z| = \sqrt{z \bar{z}} = \sqrt{x^2 + y^2} \quad \text{where } z = x + iy\]
+
+The angle $\theta$ between two vectors $x, y \in \mathbb{C}^n$ is defined as:
+\[\cos(\theta) = \frac{\inner{x}{y}}{\|x\| \|y\|}\]
+
+\subsubsection*{Observation}
+The inner product is bilinear, which means:
+\begin{enumerate}
+    \item $\inner{x_1 + x_2}{y} = \inner{x_1}{y} + \inner{x_2}{y}$
+    \item $\inner{x}{y_1 + y_2} = \inner{x}{y_1} + \inner{x}{y_2}$
+    \item $\inner{\alpha x}{\beta y} = \alpha \bar{\beta} \inner{x}{y}$ for all $\alpha, \beta \in \mathbb{C}$
+\end{enumerate}
+
+For all vectors or matrices $A, B$ of compatible dimensions, we have:
+\[(A B)^* = B^* A^*\]
+
+\subsubsection{Orthogonal Vectors}
+Two vectors $x, y \in \mathbb{C}^n$ are orthogonal if $\inner{x}{y} = 0$.
+
+\subsubsection*{Observation}
+If $x$ and $y$ are orthogonal, then they are perpendicular.
+
+With $x = \{x_1, x_2, \ldots, x_n\}$ and $y = \{y_1, y_2, \ldots, y_n\}$, $x$ and $y$ are orthogonal if and only if:
+\[\inner{x_i}{y_j} = 0, \quad \forall i, j = 1, 2, \ldots, n\]
+
+\subsubsection{Orthonormal Vectors}
+A set of vectors $\{x_1, x_2, \ldots, x_n\} \subset \mathbb{C}^n$ is orthonormal if:
+\[\inner{x_i}{x_j} = 0 \text{ for } i \neq j \quad \text{and} \quad \inner{x_i}{x_i} = \|x_i\|^2 = 1\]
+
+\subsubsection*{Observation}
+The vectors in an orthogonal set are linearly independent.
+
+\subsubsection{Orthogonal and Unitary Matrices}
+A matrix $Q \in \mathbb{R}^{n \times n}$ is orthogonal if its columns form an orthonormal set, i.e. $Q^T Q = QQ^T = I$.
+
+A matrix $U \in \mathbb{C}^{n \times n}$ is unitary if its columns form an orthonormal set, i.e. $U^* U = UU^* = I$.
+
+\subsubsection*{Observation}
+If $U \in \mathbb{C}^{n \times n}$ is unitary, then $U^{-1} = U^*$ and 
+\[\begin{bmatrix}
+    u_1^* \\
+    u_2^* \\
+    \vdots \\
+    u_n^*
+\end{bmatrix} \begin{bmatrix}
+    u_1 & u_2 & \cdots & u_n
+\end{bmatrix} = \begin{bmatrix}
+    1 & 0 & \cdots & 0 \\
+    0 & 1 & \cdots & 0 \\
+    \vdots & \vdots & \ddots & \vdots \\
+    0 & 0 & \cdots & 1
+\end{bmatrix}
+\] 
+which implies that $\inner{u_i}{u_j} = \delta_{ij}$ where $\delta_{ij}$ is the Kronecker delta, i.e. $\delta_{ij} = \begin{cases}
+1 & \text{if } i = j \\
+0 & \text{if } i \neq j
+\end{cases}$.
+
+\end{document}
