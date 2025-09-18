@@ -315,4 +315,195 @@ which implies that $\inner{u_i}{u_j} = \delta_{ij}$ where $\delta_{ij}$ is the K
 0 & \text{if } i \neq j
 \end{cases}$.
 
+\section{Vector Spaces}
+A vector space $\mathcal{V}$ over a field $\mathbb{F}$ (usually $\mathbb{R}$ or $\mathbb{C}$) is a set of objects called vectors, along with two operations: vector addition and scalar multiplication, satisfying the following axioms for all $u, v, w \in \mathcal{V}$ and $\alpha, \beta \in \mathbb{F}$:
+\begin{enumerate}
+    \item (Closure under addition) $u + v \in \mathcal{V}$
+    \item (Commutativity) $u + v = v + u$
+    \item (Associativity) $(u + v) + w = u + (v + w)$
+    \item (Existence of additive identity) There exists an element $0 \in \mathcal{V}$ such that $u + 0 = u$
+    \item (Existence of additive inverses) For each $u \in \mathcal{V}$, there exists an element $-u \in \mathcal{V}$ such that $u + (-u) = 0$
+    \item (Closure under scalar multiplication) $\alpha u \in \mathcal{V}$
+    \item (Distributivity of scalar multiplication with respect to vector addition) $\alpha (u + v) = \alpha u + \alpha v$
+    \item (Distributivity of scalar multiplication with respect to field addition) $(\alpha + \beta) u = \alpha u + \beta u$
+    \item (Associativity of scalar multiplication) $\alpha (\beta u) = (\alpha \beta) u$
+    \item (Existence of multiplicative identity) $1 u = u$ where $1$ is the multiplicative identity in $\mathbb{F}$
+\end{enumerate}
+
+\subsection{Linear Subspaces}
+A subset $\mathcal{W}$ of a vector space $\mathcal{V}$ is a subspace if $\mathcal{W}$ is itself a vector space under the operations of addition and scalar multiplication defined on $\mathcal{V}$:
+\begin{enumerate}
+    \item (Closure under addition) $u + v \in \mathcal{W}$
+    \item (Closure under scalar multiplication) $\alpha u \in \mathcal{W}$
+\end{enumerate}
+
+\subsection{Linear Independence}
+A set of vectors $\{v_1, v_2, \ldots, v_k\} \subset \mathcal{V}$ is linearly independent if the only solution to
+\[\alpha_1 v_1 + \alpha_2 v_2 + \cdots + \alpha_k v_k = 0\]
+is $\alpha_1 = \alpha_2 = \cdots = \alpha_k = 0$. If there exists a non-trivial solution, the set is linearly dependent.
+
+\subsection{Basis and Dimension}
+A basis of a vector space $\mathcal{V}$ is a set of linearly independent vectors that spans $\mathcal{V}$. The dimension of $\mathcal{V}$, denoted $\dim(\mathcal{V})$, is the number of vectors in any basis of $\mathcal{V}$. 
+
+\subsection{Inner Product and Norms}
+An inner product on a vector space $\mathcal{V}$ over $\mathbb{F}$ is a function $\inner{\cdot}{\cdot} : \mathcal{V} \times \mathcal{V} \to \mathbb{F}$. The standard inner product on $\mathbb{C}^n$ is defined as:
+\[\inner{x}{y} = y^* x = \sum_{i=1}^{n} \bar{y}_i x_i\]
+
+A norm on a vector space $\mathcal{V}$ is a function $\|\cdot\| : \mathcal{V} \to \mathbb{R}$ satisfying:
+\begin{enumerate}
+    \item (Non-negativity) $\|v\| \geq 0$
+    \item (Definiteness) $\|v\| = 0$ if and only if $v = 0$
+    \item (Homogeneity) $\|\alpha v\| = |\alpha| \|v\|$ for all $\alpha \in \mathbb{F}$ and $v \in \mathcal{V}$
+    \item (Triangle inequality) $\|u + v\| \leq \|u\| + \|v\|$ for all $u, v \in \mathcal{V}$
+\end{enumerate}
+The $p$-norm on $\mathbb{C}^n$ is defined as:
+\[\|x\|_p = \left( \sum_{i=1}^{n} |x_i|^p \right)^{1/p}\]
+for $1 \leq p < \infty$, and the $\infty$-norm is defined as:
+\[\|x\|_\infty = \max_{1 \leq i \leq n} |x_i|\]
+
+\begin{center}
+    \begin{tikzpicture}[scale=0.75]
+        \begin{axis}[
+            axis lines = middle,
+            xlabel = $x$,
+            ylabel = {$y$},
+            xmin=-1.5, xmax=1.5,
+            ymin=-1.3, ymax=1.3,
+            legend style={at={(0.15,0.6)}, anchor=south east, font=\small, draw=none, }
+                ]       \addplot [
+            domain=0:360, 
+            samples=200, 
+            smooth, 
+            variable=\t, 
+            thick,
+            black
+        ] 
+        plot ({cos(\t)}, {sin(\t)});
+        \addlegendentry{$p=1$}    
+        \addplot [
+            domain=0:360, 
+            samples=200, 
+            smooth, 
+            variable=\t, 
+            thick,
+            blue
+        ] 
+        plot ({sign(cos(\t))*abs(cos(\t))^(1/2)}, {sign(sin(\t))*abs(sin(\t))^(1/2)});
+        \addlegendentry{$p=2$}
+        \addplot [
+            domain=0:360, 
+            samples=200, 
+            smooth, 
+            variable=\t, 
+            thick,
+            red
+        ] 
+        plot ({sign(cos(\t))*abs(cos(\t))^(1/3)}, {sign(sin(\t))*abs(sin(\t))^(1/3)});
+        \addlegendentry{$p=3$}
+        \addplot [
+            domain=0:360, 
+            samples=200, 
+            smooth, 
+            variable=\t, 
+            thick,
+            green
+        ] 
+        plot ({sign(cos(\t))*abs(cos(\t))^(1/4)}, {sign(sin(\t))*abs(sin(\t))^(1/4)});
+        \addlegendentry{$p=4$}
+        \addplot [
+            domain=0:360, 
+            samples=200, 
+            smooth, 
+            variable=\t, 
+            thick,
+            orange
+        ] 
+        plot ({sign(cos(\t))*abs(cos(\t))^(1/5)}, {sign(sin(\t))*abs(sin(\t))^(1/5)});
+        \addlegendentry{$p=5$}
+        \addplot [
+            domain=0:360, 
+            samples=200, 
+            smooth, 
+            variable=\t, 
+            thick,
+            purple
+        ] 
+        plot ({sign(cos(\t))*abs(cos(\t))^(1/6)}, {sign(sin(\t))*abs(sin(\t))^(1/6)});
+        \addlegendentry{$p=6$}
+        \end{axis}
+    \end{tikzpicture}
+    \hspace{1cm}
+    \begin{tikzpicture}[scale=0.75]
+        \begin{axis}[
+            axis lines = middle,
+            xlabel = $x$,
+            ylabel = {$y$},
+            xmin=-1.5, xmax=1.5,
+            ymin=-1.3, ymax=1.3,
+            legend pos=north west,
+            legend style={font=\small, draw=none, at={(0.15,0.9)}, anchor=south east}
+        ]
+        \addplot [
+            domain=0:500, 
+            samples=200, 
+            smooth, 
+            variable=\t, 
+            thick,
+            black
+        ] 
+        ({sign(cos(\t))*abs(cos(\t))^(1/30)}, {sign(sin(\t))*abs(sin(\t))^(1/30)});
+        \addlegendentry{$p=\infty$}
+        \end{axis} 
+    \end{tikzpicture}
+\end{center}
+
+\subsubsection{Lemma}
+Let $\|\cdot\|_\alpha$ and $\|\cdot\|_\beta$ be two norms on a finite-dimensional vector space $\mathcal{V}$. Then there exist positive constants $c_1$ and $c_2$ such that for all $v \in \mathcal{V}$:
+\[c_1 \|v\|_\alpha \leq \|v\|_\beta \leq c_2 \|v\|_\alpha\]
+
+$\|\cdot\|_\alpha$ and $\|\cdot\|_\beta$ are said to be equivalent norms. In $\mathbb{R}^n$:
+\[\|x\|_2 \leq \|x\|_1 \leq \sqrt{n} \|x\|_2\]
+\[\|x\|_\infty \leq \|x\|_2 \leq \sqrt{n} \|x\|_\infty\]
+\[\|x\|_\infty \leq \|x\|_1 \leq n \|x\|_\infty\]
+
+\section{Matrix Norms}
+A matrix norm is a function $\|\cdot\| : \mathbb{C}^{m \times n} \to \mathbb{R}$ satisfying:
+\begin{enumerate}
+    \item (Non-negativity) $\|A\| \geq 0$
+    \item (Definiteness) $\|A\| = 0$ if and only if $A = 0$
+    \item (Homogeneity) $\|\alpha A\| = |\alpha| \|A\|$ for all $\alpha \in \mathbb{C}$ and $A \in \mathbb{C}^{m \times n}$ 
+    \item (Triangle inequality) $\|A + B\| \leq \|A\| + \|B\|$ for all $A, B \in \mathbb{C}^{m \times n}$
+    \item (Sub-multiplicativity) $\|AB\| \leq \|A\| \|B\|$ for all $A \in \mathbb{C}^{m \times n}$ and $B \in \mathbb{C}^{n \times p}$
+\end{enumerate}
+
+\subsection{Frobenius Norm}
+The Frobenius norm of a matrix $A \in \mathbb{C}^{m \times n}$ is defined as:
+\[\|A\|_F = \sqrt{\sum_{i=1}^{m} \sum_{j=1}^{n} |a_{ij}|^2} = \sqrt{\text{trace}(A^* A)}\]
+
+\subsection{Induced Norms}
+The induced norm (or operator norm) of a matrix $A \in \mathbb{C}^{m \times n}$ is defined as:
+\[\|A\| = \sup_{x \neq 0} \frac{\|Ax\|}{\|x\|} = \sup_{\|x\| = 1} \|Ax\|\]  
+
+\subsection{Consistent Norms}
+Let $\|\cdot\|_{m \times n}, \|\cdot\|_{n \times p}$ and $\|\cdot\|_{m \times p}$ be three matrix norms on $\mathbb{C}^{m \times n}, \mathbb{C}^{n \times p}$ and $\mathbb{C}^{m \times p}$ respectively. They are said to be consistent if:
+\[\|AB\|_{m \times p} \leq \|A\|_{m \times n} \|B\|_{n \times p}, \quad \forall A \in \mathbb{C}^{m \times n}, B \in \mathbb{C}^{n \times p}\]
+
+\subsection{Properties of Induced Norms}
+\begin{enumerate}
+    \item $\|Ax\| \leq \|A\| \|x\|$ for all $A \in \mathbb{C}^{m \times n}$ and $x \in \mathbb{C}^n$
+    \item $\|AB\| \leq \|A\| \|B\|$ for all $A \in \mathbb{C}^{m \times n}$ and $B \in \mathbb{C}^{n \times p}$
+    \item $\|A\|_\infty = \max_{1 \leq i \leq m} \sum_{j=1}^{n} |a_{ij}|$ (maximum absolute row sum)
+    \item $\|A\|_1 = \max_{1 \leq j \leq n} \sum_{i=1}^{m} |a_{ij}|$ (maximum absolute column sum)
+    \item $\|A\|_2 = \sqrt{\lambda_{\max}(A^* A)}$ (with $\lambda_{\max}$ the largest eigenvalue)
+    \item $\|A\|_2 = \|A^T\|_2$
+    \item $\|A\|_2 = \max |\lambda_i(A)|$ if $A$ is normal (i.e. $A^* A = A A^*$)
+    \item $\|A\|_F = \sqrt{\text{trace}(A^* A)}$
+\end{enumerate} 
+
+So, in general,
+\[\|A\|_\alpha = \max_{x \neq 0} \frac{\|Ax\|_\alpha}{\|x\|_\alpha} = \max_{\|x\|_\alpha = 1} \|Ax\|_\alpha\]
+
+The Frobenius norm is consistent with the euclidean vector norm, but it is not an induced norm.
+
+
 \end{document}
