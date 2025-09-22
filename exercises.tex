@@ -1,0 +1,163 @@
+\documentclass[11pt]{article}
+
+% Increase main memory size
+\usepackage{etex}
+\usepackage{morewrites}
+\usepackage{multicol}
+\usepackage{pgfplots}
+\usepackage{tikz}
+\usetikzlibrary{external}
+\tikzexternalize[prefix=cached_models/]
+
+\usepackage{etex}
+\usepackage{morewrites}
+\usepackage{enumitem}
+\usepackage{float}
+
+\listfiles
+
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{verbatim}
+\usetikzlibrary{3d}
+
+% Page Layout
+\geometry{a4paper, margin=1in}
+\setlength\parindent{0pt}
+\pgfplotsset{compat=1.18}
+
+% Custom commands
+\newcommand{\card}[1]{\lvert #1 \rvert}
+\newcommand{\inner}[2]{\left\langle #1, #2 \right\rangle}
+
+\title{\textbf{Exercises in Numerical Linear Algebra}}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section*{Exercise 1.1}
+\textbf{\large Prove the following inequality:}
+\[\|x\|_2 \leq \|x\|_1 \leq \sqrt{n}\|x\|_2\]
+
+We start proving that
+\[\|x\|_2 \leq \|x\|_1\]
+\[\|x\|_1^2 = \left(\sum_{i=1}^n |x_i|\right)^2 = \sum_{i=1}^n |x_i|^2 + \sum_{i \neq j} |x_i||x_j|\]
+\[\|x\|_2^2 = \sum_{i=1}^n |x_i|^2\]
+Since \(\sum_{i \neq j} |x_i||x_j| \geq 0\), we have that \(\|x\|_1^2 \geq \|x\|_2^2\) and therefore \(\|x\|_1 \geq \|x\|_2\).
+\vskip 0.5cm
+Now we prove that
+\[\|x\|_1 \leq \sqrt{n}\|x\|_2\]
+By Cauchy-Schwarz inequality, for a vector \(a = (|x_1|, |x_2|, \ldots, |x_n|)\) and \(b = (1, 1, \ldots, 1)\),
+\[\|a \cdot b\| \leq \|a\| \|b\|\]
+
+Therefore,
+\[|a \cdot b| = \sum_{i=1}^n |x_i| = \|x\|_1 \cdot 1 = \|a\|_1 = \|x\|_1\]
+\[\|a\|_2 = \sqrt{\sum_{i=1}^n |x_i|^2} = \|x\|_2\]
+\[\|b\|_2 = \sqrt{\sum_{i=1}^n 1^2} = \sqrt{n}\]
+Thus,
+\[\|x\|_1 \leq \|x\|_2 \sqrt{n}\]
+\hfill \(\blacksquare\)
+\pagebreak
+\section*{Exercise 1.2}
+\textbf{\large Prove the following inequality:}
+\[\|x\|_\infty \leq \|x\|_2 \leq \sqrt{n}\|x\|_\infty\]
+We start proving that
+\[\|x\|_\infty \leq \|x\|_2\]
+Let \(\|x\|_\infty = |x_k|\) for some \(k\). Then,
+\[\|x\|_2^2 = \sum_{i=1}^n x_i^2 = |x_1|^2 + |x_2|^2 + \ldots + |x_k|^2 + \ldots + |x_n|^2 \geq |x_k|^2 = \|x\|_\infty^2\]
+Taking square roots, we get \(\|x\|_2 \geq \|x\|_\infty\).
+\vskip 0.5cm
+Now we prove that
+\[\|x\|_2 \leq \sqrt{n}\|x\|_\infty\]
+Since \(\forall i, |x_i| \leq \max_j |x_j| = \|x\|_\infty\), we have
+\[\|x\|_i^2 \leq \|x\|_\infty^2\]
+Thus,
+\[\sqrt{\sum_{i=1}^n |x_i|^2} \leq \sqrt{\sum_{i=1}^n \|x\|_\infty^2} = \sqrt{n\|x\|_\infty^2} = \sqrt{n}\|x\|_\infty\]
+\hfill \(\blacksquare\)
+
+\section*{Exercise 1.3}
+\textbf{\large Prove the following inequality:}
+\[\|x\|_\infty \leq \|x\|_1 \leq n\|x\|_\infty\]
+We start proving that
+\[\|x\|_\infty \leq \|x\|_1\]
+Given that \(\|x\|_\infty = |x_k|\) for some \(k\), we have
+\[\|x\|_1 = \sum_{i=1}^n |x_i| = |x_1| + |x_2| + \ldots + |x_k| + \ldots + |x_n| \geq |x_k| = \|x\|_\infty\]
+\vskip 0.5cm
+Now we prove that
+\[\|x\|_1 \leq n\|x\|_\infty\]
+Since \(\forall i, |x_i| \leq \max_j |x_j| = \|x\|_\infty\), we have
+\[\|x\|_i \leq \|x\|_\infty\]
+Thus,
+\[\|x\|_1 = \sum_{i=1}^n |x_i| \leq \sum_{i=1}^n \|x\|_\infty = n\|x\|_\infty\]
+\hfill \(\blacksquare\)
+\pagebreak
+\section*{Exercise 2.1}
+\textbf{\large Prove the following definition of matrix norm:}
+\[\|A\|_1 = \max_{1 \leq j \leq n} \sum_{i=1}^m |a_{ij}| = \max \{\|col(A)_1\|_1, \|col(A)_2\|_1, \ldots, \|col(A)_n\|_1\}\]
+
+With \(A \in \mathbb{R}^{m \times n}, x \in \mathbb{R}^n\), we have
+\[\|A\|_1 = \sup_{\|x\|_1 = 1} \|Ax\|_1\]
+where
+\[\|Ax\|_1 = \sum_{i=1}^m |(Ax)_i| = \sum_{i=1}^m \left|\sum_{j=1}^n a_{ij}x_j\right| \leq \sum_{i=1}^m \sum_{j=1}^n |a_{ij}||x_j| = \sum_{j=1}^n |x_j| \sum_{i=1}^m |a_{ij}|\]
+
+and we have 
+\[\sum_{j=1}^n |x_j| \sum_{i=1}^m |a_{ij}| \leq \max_{1 \leq j \leq n} \sum_{i=1}^m |a_{ij}| \sum_{j=1}^n |x_j| = \mathcal{C} \|x\|_1\]
+where \(\mathcal{C} = \max_{1 \leq j \leq n} \sum_{i=1}^m |a_{ij}|\).
+
+So now, we need to prove the following:
+\[\forall x \in \mathbb{R}^n,\text{ } \|Ax\|_1 \leq \mathcal{C} \|x\|_1 \quad \text{and} \quad \|Ax\|_1 = \mathcal{C} \|x\|_1, \text{ for some } x \in \mathbb{R}^n.\]
+
+Let us pick \(k\) such that
+\[c_k = \sum_{i=1}^m |a_{ik}|\]
+
+with \(x = e_k\), the standard basis vector with 1 in the \(k\)-th position and 0 elsewhere. Then,
+\[\sup \|Ax\|_1 = \|A e_k\|_1 = \|a_k\|_1 = \sum_{i=1}^m |a_{ik}| = c_k \]
+and
+\[\|x\|_1 = 1\]
+Thus,
+\[\|Ax\|_1 = c_k \|x\|_1 = \mathcal{C} \|x\|_1\]
+\hfill \(\blacksquare\)
+
+\section*{Exercise 2.2}
+\textbf{\large Prove the following definition of matrix norm:}
+\[\|A\|_2 = \sqrt{\lambda_1}, \text{ where } \lambda_1 \text{ is the largest eigenvalue of } A^TA\]
+
+We have
+\[\|Ax\|_2^2 = x^T A^T A x\]
+
+with \(x = \alpha_1 z_1, \alpha_2 z_2, \ldots, \alpha_n z_n\), where \(A^T A z_i = \lambda_i z_i\):
+\[x^T A^T A x = \lambda_1 \alpha_1^2 + \lambda_2 \alpha_2^2 + \ldots + \lambda_n \alpha_n^2 \leq \lambda_1 x^T x = \lambda_1 \left(\alpha_1^2 + \alpha_2^2 + \ldots + \alpha_n^2\right)\]
+Because of orthonormality, \(\alpha_1^2 + \alpha_2^2 + \ldots + \alpha_n^2 = 1\), and we get
+\[\|Ax\|_2^2 \leq \lambda_1\]
+
+Now, we need to prove that \(\|Ax\|_2^2 = \lambda_1\)
+\[\|A\|_2^2 = \sup_{\|x\|_2 = 1} \|Ax\|_2^2 = \lambda_1\]
+
+\section*{Exercise 2.3}
+\textbf{\large Prove the following definition of matrix norm:}
+\[\|A\|_\infty = \max\{\|row(A)_1\|_1, \|row(A)_2\|_1, \ldots, \|row(A)_m\|_1\} = \max_{1 \leq i \leq m} \sum_{j=1}^n |a_{ij}|\]
+
+Using the definition of induced norm, we have
+\[\|A\|_\infty = \max_{1 \leq i \leq m} \left|\sum_{j=1}^n a_{ij} x_j\right| \leq \max_{1 \leq i \leq m} \sum_{j=1}^n |a_{ij}||x_j|\]
+\[\|x\|_\infty = 1 \Rightarrow \|Ax\|_\infty \leq \max_{1 \leq i \leq m} \sum_{j=1}^n |a_{ij}|  = \sum_{j=1}^n |a_{kj}|, \text{ for some } k\]
+
+We define \(x \in \mathbb{R}^n\) such that
+\[x_j = \begin{cases}
+    \dfrac{a_{kj}}{|a_{kj}|} & , \text{ if } a_{kj} \neq 0 \\
+    0 & , \text{ if } a_{kj} = 0
+\end{cases}\]
+
+Then,
+\[\|Ax\|_\infty = \max_{1 \leq i \leq m} \left|\sum_{j=1}^n a_{ij} x_j\right| = \left|\sum_{j=1}^n a_{kj} x_j\right| = \sum_{j=1}^n |a_{kj}| = \max_{1 \leq i \leq m} \sum_{j=1}^n |a_{ij}|\]
+\hfill \(\blacksquare\)
+
+
+
+\end{document}
