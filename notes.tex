@@ -505,5 +505,65 @@ So, in general,
 
 The Frobenius norm is consistent with the euclidean vector norm, but it is not an induced norm.
 
+\subsection{Equivalence of Matrix Norms}
+Let $\|\cdot\|_\alpha$ and $\|\cdot\|_\beta$ be two matrix norms on $\mathbb{C}^{m \times n}$. Then there exist positive constants $c_1$ and $c_2$ such that for all $A \in \mathbb{C}^{m \times n}$:
+\[c_1 \|A\|_\alpha \leq \|A\|_\beta \leq c_2 \|A\|_\alpha\]
+
+\section{Conditioning and Stability}
+\subsection{Conditioning}
+The conditioning is a measure of how the output value of a function changes with respect to small changes in the input value.
+\[f : X \to Y\]
+With a small perturbation in the input \( x \) to \( x + \delta x \), the output changes from \( f(x) \) to \( f(x + \delta x) \). We define
+\[\delta f = f(x + \delta x) - f(x)\]
+
+We want to measure how large \( \delta f \) is relative to \( f(x) \) when \( \delta x \) is small relative to \( x \).
+\subsubsection{Absolute Condition Number}
+The normwise absolute condition number of a function \( f \) at a point \( x \) is defined as:
+\[\hat{\kappa}_f(x) = \lim_{\delta x \to 0} \sup_{\|\delta x\| \leq \delta} \frac{\|\delta f\|}{\|\delta x\|} \approx \sup_{\|\delta x\| < \delta} \frac{\|\delta f\|}{\|\delta x\|}\]
+
+If \( f \) is differentiable at \( x \), then
+\[\hat{\kappa}_f(x) = \lim_{\delta x \to 0} \sup_{\|\delta x\| \leq \delta} \frac{\|\delta f(x)\|}{\|\delta x\|} = \|J_f(x)\|\]
+where \( J_f(x) \) is the Jacobian of \( f \) at \( x \).
+
+\subsubsection{Relative Condition Number}
+The normwise relative condition number of a function \( f \) at a point \( x \) is defined as:
+\[\kappa_f(x) = \lim_{\delta x \to 0} \sup_{\frac{\|\delta x\|}{\|x\|} \leq \delta} \frac{\|\delta f\| / \|f(x)\|}{\|\delta x\| / \|x\|} \stackrel{f \text{ differentiable}}{=} \frac{\|J_f(x)\| \|x\|}{\|f(x)\|}\]
+\subsubsection*{Example}
+Let \( f : \mathbb{R} \setminus \{0\} \to \mathbb{R} \) be defined as \( f(x) = \dfrac{1}{x} \). Then \( f'(x) = -\dfrac{1}{x^2} \) and
+\[\hat{\kappa}_f(x) = |f'(x)| = \frac{1}{|x|^2}, \quad \kappa_f(x) = \frac{|f'(x)| |x|}{|f(x)|} = 1\]
+As \( x \to 0 \), \( \hat{\kappa}_f(x) \to \infty \) but \( \kappa_f(x) = 1 \). This means that \( f(x) = \frac{1}{x} \) is well-conditioned for all \( x \neq 0 \) in the relative sense, but it is ill-conditioned as \( x \to 0 \) in the absolute sense.
+
+\subsubsection*{Example}
+Let \( f : \mathbb{R}^2 \to \mathbb{R} \) be defined as \( f(x,y) = x - y \). Then, \( f \) is differentiable and
+\[J_f(x,y) = \begin{bmatrix}1 & -1\end{bmatrix}\]
+So,
+\[\hat{\kappa}_f(x,y) = \|J_f(x,y)\|_2 = \sqrt{2}, \quad \|\kappa_f(x,y)\|_1 = \frac{\|J_f(x,y)\|_1 \|(x,y)\|_1}{|f(x,y)|} = \frac{2(|x| + |y|)}{|x - y|}\]
+As \( x \to y \), \( \kappa_f(x,y) \to \infty \). This means that \( f(x,y) = x - y \) is ill-conditioned when \( x \) is close to \( y \).
+
+\subsubsection*{Example}
+Let \( f : \mathbb{R}^2 \to \mathbb{R} \) be defined as \( f(x,y) = \dfrac{x}{y} \). Then
+\[\|\kappa_f(x,y)\|_2 = \left|\frac{x}{y}\right| + \left|\frac{y}{x}\right|\]
+As \( y \to 0 \) or \( x \to 0 \), \( \kappa_f(x,y) \to \infty \). This means that \( f(x,y) = \dfrac{x}{y} \) is ill-conditioned when \( y \) or \( x \) is close to \( 0 \).
+
+\subsection{Stability}
+An algorithm is stable if it produces an output that is close to the exact solution of a problem. Formally, an algorithm \( \hat{f} \) for the problem \( f : X \to Y \) is \textbf{numerically stable} if for every input \( x \in X \), there exists \(\hat{x} = x + \delta x \in X\) such that
+\[\frac{\|\hat{f}(x) - f(\hat{x})\|}{\|f(x)\|} = O(\epsilon_{\text{mach}}) \quad \text{and} \quad \frac{\|x - \hat{x}\|}{\|x\|} = O(\epsilon_{\text{mach}})\]
+where \( \epsilon_{\text{mach}} \) is the machine precision.
+
+An algorithm is \textbf{backward stable} if for every input \( x \in X \), there exists \(\hat{x} = x + \delta x \in X\) such that  
+\[\hat{f}(x) = f(\hat{x}) \quad \text{and} \quad \frac{\|x - \hat{x}\|}{\|x\|} = O(\epsilon_{\text{mach}})\]
+
+\subsection{Accuracy}
+An algorithm \( \hat{f} \) is said to be \textbf{accurate} if it produces results that are close to the true solution \( f(x) \) for all inputs \( x \in X \). Formally, this means that for every input \( x \in X \), the following holds:
+\[\frac{\|\hat{f}(x) - f(\hat{x})\|}{\|f(x)\|} = O(\epsilon_{\text{mach}})\]
+
+\subsubsection*{Observation}
+A numerically stable algorithm or a backward stable algorithm is accurate if the problem it solves is well-conditioned.
+\[\frac{\|\hat{f}(x) - f(\hat{x})\|}{\|f(x)\|} = \frac{\|f(\hat{x}) + \Delta y - f(x)\|}{\|f(x)\|} \leq \frac{\|f(x + \Delta x) - f(x)\|}{\|f(x)\|} + \frac{\|\Delta y\|}{\|f(x)\|} \cdot \|y\|\]
+\[\leq \frac{\|f(x + \Delta x) - f(x)\| / \|f(x)\|}{\|\Delta x\| / \|x\|} \cdot \frac{\|\Delta x\|}{\|x\|} + O(\epsilon_{\text{mach}}) = O(\kappa_f(x) \epsilon_{\text{mach}})\]
+where \( \Delta x = \hat{x} - x \) and \( \Delta y = \hat{f}(x) - f(\hat{x}) \).
+
+
+
 
 \end{document}
