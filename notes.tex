@@ -14,6 +14,11 @@
 \usepackage{enumitem}
 \usepackage{float}
 \usepackage[linesnumbered,ruled,vlined]{algorithm2e}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+
+% Define \Comment for algorithmicx
+\renewcommand{\Comment}[1]{\hfill\textit{// #1}}
 \listfiles
 
 \usepackage{amsmath, amssymb, amsthm}
@@ -563,7 +568,7 @@ A numerically stable algorithm or a backward stable algorithm is accurate if the
 \[\leq \frac{\|f(x + \Delta x) - f(x)\| / \|f(x)\|}{\|\Delta x\| / \|x\|} \cdot \frac{\|\Delta x\|}{\|x\|} + O(\epsilon_{\text{mach}}) = O(\kappa_f(x) \epsilon_{\text{mach}})\]
 where \( \Delta x = \hat{x} - x \) and \( \Delta y = \hat{f}(x) - f(\hat{x}) \).
 
-\section{Gaussian Elimination}
+\section{Solving Linear Systems}
 Let 
 \[A = \begin{bmatrix}
     2 & 1 & 1 & 0 \\
@@ -669,6 +674,8 @@ Consider the Forward Elimination algorithm:
 \[\text{Output: } U \in \mathbb{R}^{n \times n}, \bar{b}^* \in \mathbb{R}^n \text{ such that } L A = U \text{ and } L \bar{b} = \bar{b}^*\]
 
 \begin{algorithm}[H]
+\KwIn{$A \in \mathbb{R}^{n \times n}, \bar{b} \in \mathbb{R}^n$}
+\KwOut{$U \in \mathbb{R}^{n \times n}, \bar{b}^* \in \mathbb{R}^n$ such that $L A = U$ and $L \bar{b} = \bar{b}^*$}
 \For{$k = 1$ \textbf{to} $n-1$}{
     \For{$i = k+1$ \textbf{to} $n$}{
         $l_{ik} = \dfrac{a_{ik}}{a_{kk}}$\;
@@ -691,8 +698,6 @@ So, the output is
 
 \subsection{Backward Substitution}
 Consider the Backward Substitution algorithm:
-\[\text{Input: } U \in \mathbb{R}^{n \times n} \text{ (upper triangular)}, \bar{b}^* \in \mathbb{R}^n\]
-\[\text{Output: } \bar{x} \in \mathbb{R}^n \text{ such that } U \bar{x} = \bar{b}^*\]
 \[R \bar{x} = \bar{b}, \quad R = \begin{bmatrix}
     r_{11} & r_{12} & \cdots & r_{1n} \\
     0 & r_{22} & \cdots & r_{2n} \\
@@ -703,6 +708,8 @@ Consider the Backward Substitution algorithm:
 
 \[ x_n = \frac{b_n}{r_{nn}} \quad \text{and} \quad x_i = \frac{b_i - \sum_{j=i+1}^{n} r_{ij} x_j}{r_{ii}}, \quad i = n-1, n-2, \ldots, 1\]
 \begin{algorithm}[H]
+\KwIn{$U \in \mathbb{R}^{n \times n}$ (upper triangular), $\bar{b} \in \mathbb{R}^n$}
+\KwOut{$\bar{x} \in \mathbb{R}^n$ such that $U \bar{x} = \bar{b}$}
 $x_n = \dfrac{b_n}{r_{nn}}$\;
 \For{$i = n-1$ \textbf{down to} $1$}{
     $x_i = b_i$\;
@@ -713,5 +720,132 @@ $x_n = \dfrac{b_n}{r_{nn}}$\;
 }
 \caption{Backward Substitution}
 \end{algorithm}
+
+\subsection{Solving Triangular Systems}
+With \(D \overline{x} = \bar{b}\), \(D \text{ diagonal } (d_{11}, d_{22}, \ldots, d_{nn}) \in \mathbb{R}^{n\times n}\), we can solve for \(\overline{x}\) as follows:
+\[x_i = \frac{b_i}{d_{ii}}, \quad i = 1, 2, \ldots, n\]
+
+With \(U \overline{x} = \bar{b}\), \(L\) upper triangular, we can solve for \(\overline{x}\) using backward substitution:
+\[\begin{bmatrix}
+    u_{11} & u_{12} & \cdots & u_{1n} \\
+    0 & u_{22} & \cdots & u_{2n} \\
+    \vdots & \vdots & \ddots & \vdots \\
+    0 & 0 & \cdots & u_{nn}
+\end{bmatrix} \begin{bmatrix}
+    x_1 \\
+    x_2 \\
+    \vdots \\
+    x_n
+\end{bmatrix} = \begin{bmatrix}
+    b_1 \\
+    b_2 \\
+    \vdots \\
+    b_n
+\end{bmatrix}\]
+\[u_{nn} x_n = b_n \quad \text{and} \quad u_{n-1,n} x_{n-1} + u_{n-1,n} x_n = b_{n-1}\]
+\[ x_n = \frac{b_n}{u_{nn}} \quad \text{and} \quad x_i = \frac{b_i - \sum_{j=i+1}^{n} u_{ij} x_j}{u_{ii}}, \quad i = n-1, n-2, \ldots, 1\]
+
+We can define the algorithm for solving \(U \overline{x} = \bar{b}\) where \(U\) is a upper triangular matrix as follows:
+
+\begin{algorithm}[H]
+\KwIn{$U \in \mathbb{R}^{n \times n}$ (upper triangular), $\bar{b} \in \mathbb{R}^n$}
+\KwOut{$\bar{x} \in \mathbb{R}^n$ such that $U \bar{x} = \bar{b}$}
+$x_n = \dfrac{b_n}{u_{nn}}$\;
+\For{$i = n-1$ \textbf{down to} $1$}{
+    $x_i = b_i$\;
+    \For{$j = i+1$ \textbf{to} $n$}{
+        $x_i = x_i - u_{ij} x_j$\;
+    }
+    $x_i = \dfrac{x_i}{u_{ii}}$\;
+}
+\caption{Solve Upper Triangular System}
+\end{algorithm}
+\vskip 0.5cm
+The cost of this algorithm is as follows:
+\[\textbf{Flops} = \sum_{i=1}^{n-1} \left(1 + 2\sum_{j=i+1}^{n} 1\right) = \cdots = \dfrac{(n-2)n}{2} \sim \mathcal{O}(n^2)\]
+
+\subsection{Gaussian Elimination}
+The Gaussian Elimination algorithm can be defined as follows:
+
+\begin{algorithm}[H]
+\KwIn{$A \in \mathbb{R}^{n \times n}, \bar{b} \in \mathbb{R}^n$}
+\KwOut{$U \in \mathbb{R}^{n \times n}, \bar{b}^* \in \mathbb{R}^n$ such that $L A = U$ and $L \bar{b} = \bar{b}^*$}
+\For{$k = 1$ \textbf{to} $n-1$}{
+    \For{$i = k+1$ \textbf{to} $n$}{
+        $t = \dfrac{a_{ik}}{a_{kk}}$; \tcp{t is a factor}
+        \For{$j = k$ \textbf{to} $n$}{
+            $a_{ij} = a_{ij} - t a_{kj}$\;
+        }
+        $b_i = b_i - t b_k$\;
+    }
+}
+\caption{Gaussian Elimination}
+\end{algorithm}
+\vskip 0.5cm
+The cost of this algorithm is as follows:
+\[\textbf{Flops} = \mathcal{O}(n^3)\]
+
+\subsection{LU Factorization}
+With \(A \in \mathbb{R}^{n \times n}\) non-singular, we can factor \(A\) as \(A = L \cdot U\) where \(L\) is a lower triangular matrix with unit diagonal and \(U\) is an upper triangular matrix:
+\[L = I + \sum_{k=1}^{n-1} l_k e_k^T \]
+
+\subsubsection*{Observation}
+If an \(n \times n\) matrix \(A\) has an LU factorization, then it is unique. Furthermore, if we relax the condition that \(L\) has a unit diagonal (i.e., normalized), then there are infinitely many LU factorizations of \(A\).
+
+\subsubsection*{Theorem}
+If all the leading principal minors of \(A\) are non-zero, i.e., \(\det(A_k) \neq 0\) for \(k = 1, 2, \ldots, n-1\) where \(A_k\) is the \(k \times k\) leading principal submatrix of \(A\), then \(A\) has an LU factorization. In particular, if \(A\) is strictly diagonally dominant or symmetric positive definite, then \(A\) has an LU factorization.
+
+\begin{proof}
+We will prove this by induction on \(n\). The base case \(n=1\) is trivial since any non-zero scalar can be factored as \(1 \cdot a_{11}\). A matrix with \(k\) row operations already done can be written as
+\[A^{(k)} = \begin{bmatrix}
+    a_{11} & a_{12} & \cdots & \cdots & a_{1n} \\
+    0 & a_{22}^{(2)} & \cdots & \cdots & a_{2n}^{(2)} \\
+    0 & 0 & a_{kk}^{(k)} & \cdots & a_{kn}^{(k)} \\
+    \vdots & \vdots & \vdots & \ddots & \vdots \\
+    0 & 0 & a_{n2}^{(k)} & \cdots & a_{nn}^{(k)}
+\end{bmatrix}\]
+where every superindex \((k)\) indicates that \(k\) row operations have been performed. Note that the leading principal submatrix of order \(k\) of \(A^{(k)}\) is the same as that of \(A\). Thus, \(\det(A^{(k)}) = \det(A_k) \neq 0\). 
+Hence, the next step is possible.
+\end{proof}
+
+\subsubsection*{Theorem}
+If an invertible matrix \(A \in \mathbb{R}^{n \times n}\) has an LU factorization, then it is unique.
+\begin{proof}
+Suppose \(A = L_1 U_1 = L_2 U_2\) where \(L_1, L_2\) are lower triangular with unit diagonal and \(U_1, U_2\) are upper triangular. Then,
+\[L_2^{-1} L_1 = U_2 U_1^{-1}\]
+The left-hand side is lower triangular with unit diagonal, and the right-hand side is upper triangular. Thus, both sides must be equal to the identity matrix. Therefore, \(L_1 = L_2\) and \(U_1 = U_2\).
+\end{proof}
+
+\subsection{Pivoting}
+We use pivoting to avoid division by zero or small numbers during the elimination process. There are three types of pivoting:
+\begin{enumerate}
+    \item Partial row pivoting: We interchange rows to ensure that the pivot element is the largest in its column.
+        \[|a_{lk}| = \max_{k \leq i \leq n} |a_{ik}^{(k)}|\]
+    \item Partial column pivoting: We interchange columns to ensure that the pivot element is the largest in its row.
+        \[|a_{kl}| = \max_{k \leq j \leq n} |a_{kj}^{(k)}|\]
+    \item Total pivoting: We interchange both rows and columns to ensure that the pivot element is the largest in the remaining submatrix.
+        \[|a_{lm}| = \max_{k \leq i,j \leq n} |a_{ij}^{(k)}|\]
+\end{enumerate}
+Total pivoting is the most stable but also the most expensive. It yields the complete \(LU\) factorization. The cost of partial pivoting is \(\mathcal{O}(n^2)\), while the cost of total pivoting is \(\mathcal{O}(n^3)\).
+\vskip 0.5cm
+The \(LU\) factorization with partial pivoting algorithm can be defined as follows:
+
+\begin{algorithm}[H]
+\caption{LU Factorization with Partial Pivoting}
+\KwIn{$A \in \mathbb{R}^{n \times n}, b \in \mathbb{R}^n$}
+\KwOut{$P, L, U$ such that $PA = LU$}
+\For{$k = 1$ \textbf{to} $n-1$}{
+    $l = \arg\max_{k \leq i \leq n} |a_{ik}^{(k)}|$\;
+    Swap rows $k$ and $l$ of $A$ and $b$\;
+    \For{$i = k+1$ \textbf{to} $n$}{
+        $t = \dfrac{a_{ik}}{a_{kk}}$\;
+        \For{$j = k$ \textbf{to} $n$}{
+            $a_{ij} = a_{ij} - t a_{kj}$\;
+        }
+        $b_i = b_i - t b_k$\;
+    }
+}
+\end{algorithm}
+
 
 \end{document}
